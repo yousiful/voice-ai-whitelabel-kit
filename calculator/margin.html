@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>White label voice AI margin calculator</title>
+<style>
+  :root {
+    --bg: #f6f7fb; --card: #ffffff; --text: #151a2e; --muted: #5b6482;
+    --line: #dde1ee; --accent: #b87900; --good: #12794a; --bad: #b42323; --input: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1020; --card: #141b33; --text: #e8ecf8; --muted: #8f9bc4;
+      --line: #2c3866; --accent: #ffd54a; --good: #44cc77; --bad: #ff6666; --input: #0d1527;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.45; }
+  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  h2 { font-size: 1.05rem; margin: 0 0 12px; }
+  p.sub { color: var(--muted); margin: 0 0 20px; }
+  .note { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 20px; font-size: .92rem; }
+  .grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  label { display: grid; grid-template-columns: 1fr 120px; gap: 8px; align-items: center;
+    font-size: .92rem; margin-bottom: 8px; }
+  label small { display: block; color: var(--muted); font-size: .78rem; }
+  input { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--input); color: var(--text); font: inherit; text-align: right; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .stat span { display: block; color: var(--muted); font-size: .8rem; }
+  .stat strong { font-size: 1.3rem; }
+  .good { color: var(--good); } .bad { color: var(--bad); }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  footer { color: var(--muted); font-size: .8rem; margin-top: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>White label voice AI margin calculator</h1>
+  <p class="sub">Work out what your reseller business earns each month and over the next 12.</p>
+  <div class="note">Every number below is an example. Replace them with your own costs and prices before you trust the output.</div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Platform</h2>
+      <label>Sub-accounts live (example)<input type="number" step="any" id="sub_accounts_live" value="12"></label>
+      <label>Sub-accounts included in fee (example)<input type="number" step="any" id="sub_accounts_included" value="10"></label>
+      <label>Platform fee you charge, $/mo (example)<input type="number" step="any" id="platform_fee" value="497"></label>
+      <label>Extra sub-account fee, $/mo (example)<input type="number" step="any" id="extra_sub_account_fee" value="30"></label>
+      <label>Your platform cost, $/mo (example)<input type="number" step="any" id="platform_cost" value="297"></label>
+      <label>Monthly growth, % (example)<input type="number" step="any" id="monthly_growth_pct" value="5"></label>
+    </div>
+    <div class="card">
+      <h2>Usage</h2>
+      <label>Voice minutes per month (example)<input type="number" step="any" id="minutes_per_month" value="6000"></label>
+      <label>Your cost per minute, $ (example)<input type="number" step="any" id="cost_per_minute" value="0.09"></label>
+      <label>Your price per minute, $ (example)<input type="number" step="any" id="price_per_minute" value="0.20"></label>
+      <label>Phone numbers (example)<input type="number" step="any" id="phone_numbers" value="12"></label>
+      <label>Cost per number, $/mo (example)<input type="number" step="any" id="number_cost" value="1.15"></label>
+      <label>Price per number, $/mo (example)<input type="number" step="any" id="number_price" value="3"></label>
+      <label>SMS segments per month (example)<input type="number" step="any" id="sms_segments" value="8000"></label>
+      <label>Cost per SMS segment, $ (example)<input type="number" step="any" id="sms_cost_per_segment" value="0.008"></label>
+      <label>Price per SMS segment, $ (example)<input type="number" step="any" id="sms_price_per_segment" value="0.02"></label>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>12 month projection</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Month</th><th>Sub-accounts</th><th>Revenue</th><th>Cost</th><th>Margin</th><th>Cumulative margin</th></tr></thead>
+        <tbody id="proj"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>Same math as calculator/margin.py. Nothing leaves your browser.</footer>
+</main>
+
+<script>
+var IDS = ["sub_accounts_live","sub_accounts_included","platform_fee","extra_sub_account_fee","platform_cost",
+  "monthly_growth_pct","minutes_per_month","cost_per_minute","price_per_minute","phone_numbers","number_cost",
+  "number_price","sms_segments","sms_cost_per_segment","sms_price_per_segment"];
+
+function read() {
+  var c = {};
+  IDS.forEach(function (id) {
+    var v = parseFloat(document.getElementById(id).value);
+    c[id] = isFinite(v) ? v : 0;
+  });
+  return c;
+}
+
+function monthNumbers(c, scale) {
+  var subs = Math.floor(c.sub_accounts_live * scale + 0.5);
+  var extra = Math.max(0, subs - c.sub_accounts_included);
+  var minutes = c.minutes_per_month * scale;
+  var numbers = c.phone_numbers * scale;
+  var sms = c.sms_segments * scale;
+  var revPlatform = c.platform_fee + extra * c.extra_sub_account_fee;
+  var revUsage = minutes * c.price_per_minute + numbers * c.number_price + sms * c.sms_price_per_segment;
+  var costUsage = minutes * c.cost_per_minute + numbers * c.number_cost + sms * c.sms_cost_per_segment;
+  var revenue = revPlatform + revUsage;
+  var cost = c.platform_cost + costUsage;
+  var margin = revenue - cost;
+  return {
+    subs: subs, revenue: revenue, cost: cost, margin: margin,
+    marginPct: revenue ? margin / revenue * 100 : 0,
+    multiple: cost ? revenue / cost : 0
+  };
+}
+
+function money(x) {
+  return (x < 0 ? "-$" : "$") + Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function render() {
+  var c = read();
+  var g = c.monthly_growth_pct / 100;
+  var m1 = monthNumbers(c, 1);
+  var cls = m1.margin >= 0 ? "good" : "bad";
+  document.getElementById("stats").innerHTML =
+    stat("Monthly revenue", money(m1.revenue), "") +
+    stat("Monthly cost", money(m1.cost), "") +
+    stat("Monthly margin", money(m1.margin), cls) +
+    stat("Margin %", m1.marginPct.toFixed(1) + "%", cls) +
+    stat("Markup multiple", m1.multiple.toFixed(2) + "x", "");
+
+  var rows = "", cum = 0;
+  for (var m = 1; m <= 12; m++) {
+    var r = monthNumbers(c, Math.pow(1 + g, m - 1));
+    cum += r.margin;
+    rows += "<tr><td>" + m + "</td><td>" + r.subs + "</td><td>" + money(r.revenue) + "</td><td>" +
+      money(r.cost) + "</td><td>" + money(r.margin) + "</td><td>" + money(cum) + "</td></tr>";
+  }
+  document.getElementById("proj").innerHTML = rows;
+}
+
+function stat(label, value, cls) {
+  return '<div class="stat"><span>' + label + '</span><strong class="' + cls + '">' + value + "</strong></div>";
+}
+
+IDS.forEach(function (id) { document.getElementById(id).addEventListener("input", render); });
+render();
+</script>
+</body>
+</html>

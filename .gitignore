@@ -1,0 +1,11 @@
+.env
+config.json
+deal.json
+out.md
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.vscode/
+.idea/
+*.swp

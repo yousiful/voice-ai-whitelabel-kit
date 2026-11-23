@@ -1,0 +1,18 @@
+{
+  "_note": "Example numbers only. Replace with your own costs and prices.",
+  "sub_accounts_live": 12,
+  "sub_accounts_included": 10,
+  "platform_fee": 497,
+  "extra_sub_account_fee": 30,
+  "platform_cost": 297,
+  "minutes_per_month": 6000,
+  "cost_per_minute": 0.09,
+  "price_per_minute": 0.20,
+  "phone_numbers": 12,
+  "number_cost": 1.15,
+  "number_price": 3.00,
+  "sms_segments": 8000,
+  "sms_cost_per_segment": 0.008,
+  "sms_price_per_segment": 0.02,
+  "monthly_growth_pct": 5
+}
